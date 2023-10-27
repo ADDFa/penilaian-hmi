@@ -9,5 +9,6 @@ class Livelines extends Model
 {
     use HasFactory;
 
+    protected $table = "liveliness";
     protected $guarded = ["id"];
 }

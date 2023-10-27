@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create("liveliness", function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_score_id")->constrained("user_scores");
+            $table->foreignId("user_score_id")->constrained("user_scores")->cascadeOnDelete();
             $table->integer("no_materi");
             $table->integer("score");
             $table->timestamps();

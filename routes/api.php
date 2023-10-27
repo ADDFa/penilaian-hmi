@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserScoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +22,12 @@ Route::controller(UserController::class)->group(function () {
     Route::post("user", "store");
     Route::put("user/{user}", "update");
     Route::delete("user/{user}", "destroy");
+});
+
+Route::controller(UserScoreController::class)->group(function () {
+    Route::get("user-score", "index");
+    Route::get("user-score/{userScore}", "show");
+    Route::post("user-score", "store");
+    Route::put("user-score/{userScore}", "update");
+    Route::delete("user-score/{userScore}", "destroy");
 });
