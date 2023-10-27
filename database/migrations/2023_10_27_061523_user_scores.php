@@ -25,8 +25,8 @@ return new class extends Migration
             $table->integer("ceramah_agama")->default(25);
             $table->integer("pre_test");
             $table->integer("post_test");
-            $table->integer("penguasaan_kelompok");
-            $table->integer("problem_solving");
+            $table->integer("penguasaan_kelompok")->default(0);
+            $table->integer("problem_solving")->default(0);
             $table->timestamps();
         });
     }

@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create("afective_indicators", function (Blueprint $table) {
+        Schema::create("user_fouls", function (Blueprint $table) {
             $table->id();
-            $table->enum("category", ["Tingkah Laku", "Tata Bahasa", "Pakaian dan Atribut"]);
-            $table->string("foul");
+            $table->foreignId("user_id")->constrained("users");
+            $table->foreignId("foul_id")->constrained("fouls");
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("afective_indicators");
+        Schema::dropIfExists("user_fouls");
     }
 };
