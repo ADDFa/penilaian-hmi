@@ -2,20 +2,44 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Closure;
+use Exception;
+use App\Http\Response;
+use Illuminate\Http\Request;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
 
-class Authenticate extends Middleware
+class Authenticate
 {
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
+     * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return string|null
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    protected function redirectTo($request)
+    public function handle(Request $request, Closure $next)
     {
-        if (! $request->expectsJson()) {
-            return route('login');
+        try {
+            $token = $request->bearerToken();
+
+            if (!$token) {
+                return Response::message("Auth Failed", 401);
+            }
+
+            $keyAccess = env("JWT_SECRET");
+            $decoded = JWT::decode($token, new Key($keyAccess, "HS256"));
+            $request->payload = $decoded;
+
+            return $next($request);
+        } catch (SignatureInvalidException $e) {
+            return Response::message("Token invalid! " . $e->getMessage(), 400);
+        } catch (ExpiredException $e) {
+            return Response::message("Token Expired!" . $e->getMessage(), 400);
+        } catch (Exception $e) {
+            return Response::message($e->getMessage(), 500);
         }
     }
 }
