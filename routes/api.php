@@ -29,6 +29,7 @@ Route::controller(UserScoreController::class)->group(function () {
     Route::get("user-score/{userScore}", "show");
     Route::post("user-score", "store");
     Route::put("user-score/{userScore}", "update");
+    Route::patch("user-score/activity", "activityToggle");
     Route::delete("user-score/{userScore}", "destroy");
 });
 
