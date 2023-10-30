@@ -14,10 +14,22 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return Response::success($users);
+        $validator = Validator::make($request->all(), [
+            "take"      => "integer",
+            "before"    => "integer|exists:user_scores,id"
+        ]);
+        if ($validator->fails()) return Response::errors($validator);
+
+        $take = $request->take ?? 100;
+
+        $users = User::take($take)->orderBy("id", "desc");
+        if ($request->before) {
+            $users = $users->where("id", "<=", $request->before);
+        }
+
+        return Response::success($users->get());
     }
 
     /**

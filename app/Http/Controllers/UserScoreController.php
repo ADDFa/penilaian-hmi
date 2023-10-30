@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Http\Response;
 use App\Models\Livelines;
 use App\Models\MiddleTest;
 use App\Models\UserScore;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -18,9 +18,30 @@ class UserScoreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            "take"      => "integer",
+            "before"    => "integer|exists:user_scores,id"
+        ]);
+        if ($validator->fails()) return Response::errors($validator);
+
+        $take = $request->take ?? 100;
+
+        $userScores = UserScore::with(["user", "middletest", "liveliness"])->take($take)->orderBy("id", "desc");
+        if ($request->before) {
+            $userScores = $userScores->where("id", "<=", $request->before);
+        }
+        $userScores = $userScores->get();
+        $result = [];
+
+        foreach ($userScores as $userScore) {
+            $accumulativeScore = new AccumulativeUserScore($userScore);
+            $accumulativeScore = $accumulativeScore->score();
+            array_push($result, $accumulativeScore);
+        }
+
+        return Response::success($result);
     }
 
     /**
@@ -76,7 +97,7 @@ class UserScoreController extends Controller
                     $name = "liveliness_" . $i;
                     $liveliness = new Livelines([
                         "no_materi"     => $i,
-                        "score"         => $request->$name,
+                        "score"         => ($request->$name + 30),
                         "user_score_id" => $userScore->id
                     ]);
                     $liveliness->save();
@@ -102,18 +123,9 @@ class UserScoreController extends Controller
     public function show(UserScore $userScore)
     {
         $result = UserScore::with(["user", "middletest", "liveliness"])->find($userScore->id);
-        return Response::success($result);
-    }
+        $result = new AccumulativeUserScore($result);
+        $result = $result->score();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\UserScore  $userScore
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, UserScore $userScore)
-    {
-        //
+        return Response::success($result);
     }
 }

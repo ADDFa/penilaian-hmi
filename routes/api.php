@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserFoulController;
 use App\Http\Controllers\UserScoreController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,4 +30,11 @@ Route::controller(UserScoreController::class)->group(function () {
     Route::post("user-score", "store");
     Route::put("user-score/{userScore}", "update");
     Route::delete("user-score/{userScore}", "destroy");
+});
+
+Route::controller(UserFoulController::class)->group(function () {
+    Route::get("user-foul", "index");
+    Route::post("user-foul", "store");
+    Route::put("user-foul/{userFoul}", "update");
+    Route::delete("user-foul/{userFoul}", "destroy");
 });
