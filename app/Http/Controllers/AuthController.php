@@ -80,7 +80,7 @@ class AuthController extends Controller
         return [
             "token_access"      => $tokenAccess,
             "token_refresh"     => $tokenRefresh,
-            "payload"           => $payload
+            "payload"           => $payloadAccess
         ];
     }
 }

@@ -35,9 +35,9 @@ class Authenticate
 
             return $next($request);
         } catch (SignatureInvalidException $e) {
-            return Response::message("Token invalid! " . $e->getMessage(), 400);
+            return Response::message($e->getMessage(), 400);
         } catch (ExpiredException $e) {
-            return Response::message("Token Expired!" . $e->getMessage(), 400);
+            return Response::message($e->getMessage(), 400);
         } catch (Exception $e) {
             return Response::message($e->getMessage(), 500);
         }
