@@ -79,7 +79,7 @@ class UserFoulController extends Controller
                 DB::commit();
 
                 return Response::success([
-                    "user_foul"     => $userFoul,
+                    "user_foul"     => UserFoul::with("foul")->find($userFoul->id),
                     "user_score"    => $userScore
                 ]);
             } catch (Exception $e) {
@@ -154,7 +154,7 @@ class UserFoulController extends Controller
 
                 return Response::success([
                     "user_score"    => $userScore,
-                    "user_foul"     => $userFoul
+                    "user_foul"     => UserFoul::with("foul")->find($userFoul->id)
                 ]);
             } catch (Exception $e) {
                 DB::rollBack();

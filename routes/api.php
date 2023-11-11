@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FoulController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFoulController;
 use App\Http\Controllers\UserScoreController;
@@ -37,8 +39,13 @@ Route::middleware(Authenticate::class)->group(function () {
         Route::get("user-score/{userScore}", "show");
         Route::post("user-score", "store");
         Route::put("user-score/{userScore}", "update");
-        Route::patch("user-score/activity", "activityToggle");
+        Route::put("update-cognitive-score/{userScore}", "updateCognitiveScore");
         Route::delete("user-score/{userScore}", "destroy");
+    });
+
+    Route::controller(ActivityController::class)->group(function () {
+        Route::patch("user-score/activity", "activityToggle");
+        Route::patch("liveliness/{liveliness}", "liveliness");
     });
 
     Route::controller(UserFoulController::class)->group(function () {
@@ -46,5 +53,9 @@ Route::middleware(Authenticate::class)->group(function () {
         Route::post("user-foul", "store");
         Route::put("user-foul/{userFoul}", "update");
         Route::delete("user-foul/{userFoul}", "destroy");
+    });
+
+    Route::controller(FoulController::class)->group(function () {
+        Route::get("foul", "index");
     });
 });

@@ -6,6 +6,7 @@ use Exception;
 use App\Http\Response;
 use App\Models\Livelines;
 use App\Models\MiddleTest;
+use App\Models\UserFoul;
 use App\Models\UserScore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,23 +54,13 @@ class UserScoreController extends Controller
      */
     public function store(Request $request)
     {
-        function getIncrementName(string $initialName, string $value = "", int $max = 10, int $start = 1): array
-        {
-            $result = [];
-            for ($i = $start; $i <= $max; $i++) {
-                $result += [$initialName . "$i" => $value];
-            }
-
-            return $result;
-        }
-
-        $middleTestRules = getIncrementName("middle_test_", "required|integer");
-        $livelinessRules = getIncrementName("liveliness_", "required|integer");
+        $middleTestRules = $this->getIncrementName("middle_test_", "required|integer");
+        $livelinessRules = $this->getIncrementName("liveliness_", "required|integer");
 
         $rules = [
             "pre_test"          => "required|integer",
             "post_test"         => "required|integer",
-            "user_id"           => "required|exists:users,id|unique:user_scores,id"
+            "user_id"           => "required|exists:users,id|unique:user_scores,user_id"
         ];
         $rules += $middleTestRules;
         $rules += $livelinessRules;
@@ -130,31 +121,88 @@ class UserScoreController extends Controller
         return Response::success($result);
     }
 
-    public function activityToggle(Request $request)
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\user  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function updateCognitiveScore(Request $request, UserScore $userScore)
     {
-        $validator = Validator::make($request->all(), [
-            "category"  => [
-                "required",
-                // GC = Group Control, PS = Problem Solving
-                Rule::in(["GC", "PS"])
-            ],
-            "user_id"   => "required|exists:user_scores,user_id"
-        ]);
+        $middleTestRules = $this->getIncrementName("middle_test_", "required|integer");
+        $rules = [
+            "pre_test"  => "required|integer",
+            "post_test" => "required|integer"
+        ];
+        $rules += $middleTestRules;
+
+        $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) return Response::errors($validator);
 
-        $userScore = UserScore::where("user_id", $request->user_id)->first();
+        $userScore->pre_test = $request->pre_test;
+        $userScore->post_test = $request->post_test;
 
-        switch ($request->category) {
-            case "GC":
-                $userScore->penguasaan_kelompok = $userScore->penguasaan_kelompok === 0 ? 10 : 0;
-                break;
+        return DB::transaction(function () use ($userScore, $request) {
+            try {
+                $userScore->save();
 
-            case "PS":
-                $userScore->problem_solving = $userScore->problem_solving === 0 ? 15 : 0;
-                break;
+                for ($i = 1; $i <= 10; $i++) {
+                    $middleTest = MiddleTest::where("user_score_id", $userScore->id)->where("no_materi", $i)->first();
+                    if ($middleTest) {
+                        $name = "middle_test_{$i}";
+                        $middleTest->score = $request->$name;
+                        $middleTest->save();
+                    }
+                }
+
+                DB::commit();
+
+                $result = UserScore::with(["user", "middletest", "liveliness"])->find($userScore->id);
+                $result = new AccumulativeUserScore($result);
+                $result = $result->score();
+
+                return Response::success($result);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return Response::message($e->getMessage(), 500);
+            }
+        });
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\UserFoul  $userFoul
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(UserScore $userScore)
+    {
+        $userFouls = UserFoul::where("user_id", $userScore->user_id)->get();
+
+        return DB::transaction(function () use ($userFouls, $userScore) {
+            try {
+                foreach ($userFouls as $foul) {
+                    $foul->delete();
+                }
+                $userScore->delete();
+
+                DB::commit();
+                return Response::success($userScore);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return Response::message($e->getMessage(), 500);
+            }
+        });
+    }
+
+    private function getIncrementName(string $initialName, string $value = "", int $max = 10, int $start = 1): array
+    {
+        $result = [];
+        for ($i = $start; $i <= $max; $i++) {
+            $result += [$initialName . "$i" => $value];
         }
 
-        $userScore->save();
-        return Response::success($userScore);
+        return $result;
     }
 }
