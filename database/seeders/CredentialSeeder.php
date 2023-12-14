@@ -16,8 +16,8 @@ class CredentialSeeder extends Seeder
     {
         $data = [
             [
-                "username"  => "admin",
-                "password"  => password_hash("password", PASSWORD_DEFAULT)
+                "username"  => "hmi-bengkulu",
+                "password"  => password_hash("hmi-bengkulu123", PASSWORD_DEFAULT)
             ]
         ];
 
