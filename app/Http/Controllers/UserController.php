@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Response;
-use App\Models\user;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,18 +16,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            "take"      => "integer",
-            "before"    => "integer|exists:user_scores,id"
-        ]);
-        if ($validator->fails()) return Response::errors($validator);
+        $users = User::orderBy("id", "desc");
 
-        $take = $request->take ?? 100;
-
-        $users = User::take($take)->orderBy("id", "desc");
-        if ($request->before) {
-            $users = $users->where("id", "<=", $request->before);
-        }
+        if ($request->take) $users->take($request->take);
+        if ($request->after) $users->where("id", "<", $request->after);
 
         return Response::success($users->get());
     }
@@ -41,11 +33,12 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "nama"  => "required|string"
+            "nama"  => "required|string",
+            "asal"  => "string"
         ]);
         if ($validator->fails()) return Response::errors($validator);
 
-        $user = new user($request->all());
+        $user = new User($validator->validate());
         $user->save();
 
         return Response::success($user);
@@ -54,10 +47,10 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\user  $user
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(user $user)
+    public function show(User $user)
     {
         return Response::success($user);
     }
@@ -66,32 +59,35 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\user  $user
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, user $user)
+    public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            "nama"  => "required|string"
+            "nama"  => "required|string",
+            "asal"  => "string"
         ]);
-        if ($validator->fails()) return Response::errors($validator);
+        if ($validator->fails()) return  Response::errors($validator);
 
-        $user->nama = $request->nama;
-        if ($request->asal) $user->asal = $request->asal;
-        $user->save();
-
+        $user->update($validator->validate());
         return Response::success($user);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\user  $user
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(user $user)
+    public function destroy(User $user)
     {
         $user->delete();
         return Response::success($user);
+    }
+
+    public function register(Request $request)
+    {
+        return $this->store($request);
     }
 }

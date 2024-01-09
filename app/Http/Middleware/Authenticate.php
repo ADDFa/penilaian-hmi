@@ -22,14 +22,11 @@ class Authenticate
      */
     public function handle(Request $request, Closure $next)
     {
+        $token = $request->bearerToken();
+        if (!$token) return Response::message("Auth Failed", 401);
+        $keyAccess = env("JWT_SECRET");
+
         try {
-            $token = $request->bearerToken();
-
-            if (!$token) {
-                return Response::message("Auth Failed", 401);
-            }
-
-            $keyAccess = env("JWT_SECRET");
             $decoded = JWT::decode($token, new Key($keyAccess, "HS256"));
             $request->payload = $decoded;
 

@@ -9,5 +9,8 @@ class Credential extends Model
 {
     use HasFactory;
 
+    protected $guarded = [""];
     protected $hidden = ["password"];
+    public $incrementing = false;
+    public $timestamps = false;
 }

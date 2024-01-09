@@ -10,4 +10,14 @@ class User extends Model
     use HasFactory;
 
     protected $guarded = ["id"];
+
+    public function training()
+    {
+        return $this->belongsTo(Training::class);
+    }
+
+    public function score()
+    {
+        return $this->hasOne(Score::class);
+    }
 }
