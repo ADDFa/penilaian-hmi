@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create("afektif_indicator_scores", function (Blueprint $table) {
             $table->id();
-            $table->foreignId("score_id")->constrained("scores");
+            $table->foreignId("score_id")->constrained("scores")->cascadeOnDelete();
             $table->integer("tingkah_laku")->default(0);
             $table->integer("tata_bahasa")->default(0);
             $table->integer("pakaian")->default(0);

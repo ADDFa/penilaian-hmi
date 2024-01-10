@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Response;
+use App\Models\AfektifIndicatorScore;
 use App\Models\Score;
 use App\Models\Training;
 use App\Models\User;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class UserTrainingController extends Controller
@@ -20,7 +24,7 @@ class UserTrainingController extends Controller
     public function index(Request $request)
     {
         $training = Training::find($request->training_id);
-        $users = User::with("score")->where("training_id", $request->training_id)->get();
+        $users = User::with(["score", "score.afectiveScore"])->where("training_id", $request->training_id)->get();
 
         return Response::success([
             "training"  => $training,
@@ -44,20 +48,30 @@ class UserTrainingController extends Controller
         if ($validator->fails()) return Response::errors($validator);
 
         $results = [];
-        foreach ($request->users as $user_id) {
-            $user = User::find($user_id);
-            $user->training_id = $request->training_id;
-            $user->save();
+        return DB::transaction(function () use ($request, $results) {
+            try {
+                foreach ($request->users as $user_id) {
+                    $user = User::find($user_id);
+                    $user->training_id = $request->training_id;
+                    $user->save();
 
-            $score = Score::firstOrCreate(["user_id" => $user_id]);
-            $score = Score::find($score->id);
+                    $score = Score::firstOrCreate(["user_id" => $user_id]);
+                    AfektifIndicatorScore::firstOrCreate(["score_id" => $score->id]);
 
-            array_push($results, [
-                "user"  => $user->toArray(),
-                "score" => $score->toArray()
-            ]);
-        }
-        return Response::success($results);
+                    $score = Score::with("afectiveScore")->find($score->id);
+                    array_push($results, [
+                        "user"  => $user->toArray(),
+                        "score" => $score->toArray()
+                    ]);
+
+                    DB::commit();
+                }
+                return Response::success($results);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return Response::message("Gagal menambahkan peserta pelatihan! {$e->getMessage()}", 500);
+            }
+        });
     }
 
     /**
