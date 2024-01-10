@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create("credentials", function (Blueprint $table) {
-            $table->foreignId("user_id")->nullable()->constrained("users");
+            $table->foreignId("user_id")->nullable()->constrained("users")->cascadeOnDelete();
             $table->string("username")->unique();
             $table->string("password");
             $table->enum("role", ["admin", "user"])->default("user");

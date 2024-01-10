@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create("afektif_indicators", function (Blueprint $table) {
             $table->id();
-            $table->foreignId("category_id")->constrained("afektif_indicator_categories");
+            $table->foreignId("category_id")->constrained("afektif_indicator_categories")->cascadeOnDelete();
             $table->string("indicator");
             $table->integer("poin_pengurangan")->default(5);
             $table->timestamps();

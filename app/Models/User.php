@@ -20,4 +20,9 @@ class User extends Model
     {
         return $this->hasOne(Score::class);
     }
+
+    public function report()
+    {
+        return $this->hasOne(Report::class);
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserTrainingController;
@@ -39,5 +40,10 @@ Route::middleware(Authenticate::class)->group(function () {
         Route::get("user-training/{user}", "show");
         Route::post("user-training", "store");
         Route::delete("user-training/{user}", "destroy");
+    });
+
+    Route::controller(ReportController::class)->group(function () {
+        Route::get("report/{training}", "index");
+        Route::put("report", "update");
     });
 });

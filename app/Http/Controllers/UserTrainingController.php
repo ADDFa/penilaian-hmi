@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Http\Response;
 use App\Models\AfektifIndicatorScore;
 use App\Models\Score;
 use App\Models\Training;
 use App\Models\User;
-use Exception;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -24,7 +23,12 @@ class UserTrainingController extends Controller
     public function index(Request $request)
     {
         $training = Training::find($request->training_id);
-        $users = User::with(["score", "score.afectiveScore"])->where("training_id", $request->training_id)->get();
+        $users = User::with([
+            "score",
+            "score.afectiveScore",
+            "score.middleTest",
+            "score.liveliness"
+        ])->where("training_id", $request->training_id)->get();
 
         return Response::success([
             "training"  => $training,
