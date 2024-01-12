@@ -44,6 +44,7 @@ class ReportController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            "score_id"  => "required|exists:scores,id",
             "user_id"   => "required|exists:users,id",
             "status"    => [
                 "required",
@@ -54,7 +55,10 @@ class ReportController extends Controller
 
         $report = Report::updateOrCreate(
             ["user_id" => $request->user_id],
-            ["status" => $request->status]
+            [
+                "status" => $request->status,
+                "score_id"  => $request->score_id
+            ]
         );
         return Response::success($report);
     }

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create("afektif_indicator_scores", function (Blueprint $table) {
+        Schema::create("afective_indicator_scores", function (Blueprint $table) {
             $table->id();
             $table->foreignId("score_id")->constrained("scores")->cascadeOnDelete();
             $table->integer("tingkah_laku")->default(0);
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("afektif_indicator_scores");
+        Schema::dropIfExists("afective_indicator_scores");
     }
 };

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create("scores", function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id")->unique()->constrained("users")->cascadeOnDelete();
+            $table->foreignId("training_id")->constrained("trainings")->cascadeOnDelete();
             $table->integer("afektif_1")->default(100);
             $table->integer("sholat")->default(100);
             $table->integer("membaca_alquran")->default(25);

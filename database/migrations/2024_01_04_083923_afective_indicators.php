@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create("afektif_indicator_categories", function (Blueprint $table) {
+        Schema::create("afective_indicators", function (Blueprint $table) {
             $table->id();
-            $table->enum("category", ["Tingkah Laku", "Tata Bahasa", "Pakaian", "Ketepatan Waktu"]);
+            $table->foreignId("category_id")->constrained("afective_indicator_categories")->cascadeOnDelete();
+            $table->string("indicator");
+            $table->integer("poin_pengurangan")->default(5);
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("afektif_indicator_categories");
+        Schema::dropIfExists("afective_indicators");
     }
 };

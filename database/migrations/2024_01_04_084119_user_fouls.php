@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create("user_fouls", function (Blueprint $table) {
             $table->id();
+            $table->foreignId("score_id")->constrained("scores")->cascadeOnDelete();
             $table->foreignId("user_id")->constrained("users")->cascadeOnDelete();
-            $table->foreignId("afektif_indicator_id")->constrained("afektif_indicators");
+            $table->foreignId("afective_indicator_id")->constrained("afective_indicators");
             $table->timestamps();
         });
     }

@@ -18,7 +18,7 @@ class Score extends Model
 
     public function afectiveScore()
     {
-        return $this->hasOne(AfektifIndicatorScore::class);
+        return $this->hasOne(AfectiveIndicatorScore::class);
     }
 
     public function middleTest()
@@ -29,5 +29,10 @@ class Score extends Model
     public function liveliness()
     {
         return $this->hasMany(Liveliness::class);
+    }
+
+    public function report()
+    {
+        return $this->hasOne(Report::class);
     }
 }

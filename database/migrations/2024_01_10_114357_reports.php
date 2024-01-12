@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create("reports", function (Blueprint $table) {
             $table->id();
+            $table->foreignId("score_id")->constrained("scores")->cascadeOnDelete();
             $table->foreignId("user_id")->unique()->constrained("users")->cascadeOnDelete();
             $table->enum("status", ["Lulus", "Lulus Bersyarat", "Tidak Lulus"])->nullable()->default(null);
             $table->timestamps();

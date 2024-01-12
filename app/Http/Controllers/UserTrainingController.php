@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Http\Response;
-use App\Models\AfektifIndicatorScore;
+use App\Models\AfectiveIndicatorScore;
 use App\Models\Score;
 use App\Models\Training;
 use App\Models\User;
@@ -59,8 +59,11 @@ class UserTrainingController extends Controller
                     $user->training_id = $request->training_id;
                     $user->save();
 
-                    $score = Score::firstOrCreate(["user_id" => $user_id]);
-                    AfektifIndicatorScore::firstOrCreate(["score_id" => $score->id]);
+                    $score = Score::firstOrCreate([
+                        "user_id" => $user_id,
+                        "training_id"   => $request->training_id
+                    ]);
+                    AfectiveIndicatorScore::firstOrCreate(["score_id" => $score->id]);
 
                     $score = Score::with("afectiveScore")->find($score->id);
                     array_push($results, [
