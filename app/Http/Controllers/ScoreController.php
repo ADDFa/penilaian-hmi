@@ -26,7 +26,7 @@ class ScoreController extends Controller
      */
     public function show(Score $score)
     {
-        $result = Score::with(["user", "afectiveScore", "middleTest", "liveliness", "report"])->find($score->id);
+        $result = Score::with(["fouls", "user", "afectiveScore", "middleTest", "liveliness", "report"])->find($score->id);
         return Response::success($result);
     }
 

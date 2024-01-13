@@ -35,4 +35,9 @@ class Score extends Model
     {
         return $this->hasOne(Report::class);
     }
+
+    public function fouls()
+    {
+        return $this->hasMany(UserFoul::class);
+    }
 }

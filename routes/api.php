@@ -5,6 +5,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScoreController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserFoulController;
 use App\Http\Controllers\UserTrainingController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
@@ -50,5 +51,11 @@ Route::middleware(Authenticate::class)->group(function () {
 
     Route::controller(ScoreController::class)->group(function () {
         Route::get("score/{score}", "show");
+    });
+
+    Route::controller(UserFoulController::class)->group(function () {
+        Route::get("user-foul", "index");
+        Route::post("user-foul", "store");
+        Route::delete("user-foul/{userFoul}", "destroy");
     });
 });
