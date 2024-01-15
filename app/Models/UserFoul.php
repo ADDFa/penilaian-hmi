@@ -11,7 +11,7 @@ class UserFoul extends Model
 
     protected $guarded = ["id"];
 
-    public function afectiveIndidator()
+    public function afectiveIndicator()
     {
         return $this->belongsTo(AfectiveIndicator::class, "afective_indicator_id");
     }

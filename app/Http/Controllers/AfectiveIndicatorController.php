@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Response;
 use App\Models\AfectiveIndicator;
 use Illuminate\Http\Request;
 
@@ -14,17 +15,8 @@ class AfectiveIndicatorController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $result = AfectiveIndicator::with("category")->get();
+        return Response::success($result);
     }
 
     /**
@@ -45,17 +37,6 @@ class AfectiveIndicatorController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(AfectiveIndicator $afectiveIndicator)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\AfectiveIndicator  $afectiveIndicator
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(AfectiveIndicator $afectiveIndicator)
     {
         //
     }

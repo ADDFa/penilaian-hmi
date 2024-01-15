@@ -82,7 +82,8 @@ class UserFoulController extends Controller
                 $userFoul->save();
                 DB::commit();
 
-                return Response::success($userFoul);
+                $result = $this->show($userFoul);
+                return Response::success($result);
             } catch (Exception $e) {
                 DB::rollBack();
                 return Response::message($e->getMessage(), 500);
@@ -98,7 +99,8 @@ class UserFoulController extends Controller
      */
     public function show(UserFoul $userFoul)
     {
-        //
+        $result = UserFoul::with(["afectiveIndicator", "afectiveIndicator.category"])->find($userFoul->id);
+        return $result;
     }
 
     /**

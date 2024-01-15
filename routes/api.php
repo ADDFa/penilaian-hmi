@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\AfectiveIndicatorController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LivelinessController;
+use App\Http\Controllers\MiddleTestController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScoreController;
 use App\Http\Controllers\TrainingController;
@@ -51,11 +54,28 @@ Route::middleware(Authenticate::class)->group(function () {
 
     Route::controller(ScoreController::class)->group(function () {
         Route::get("score/{score}", "show");
+        Route::put("score/{score}", "update");
     });
 
     Route::controller(UserFoulController::class)->group(function () {
         Route::get("user-foul", "index");
         Route::post("user-foul", "store");
         Route::delete("user-foul/{userFoul}", "destroy");
+    });
+
+    Route::controller(AfectiveIndicatorController::class)->group(function () {
+        Route::get("afective-indicators", "index");
+    });
+
+    Route::controller(MiddleTestController::class)->group(function () {
+        Route::post("middle-test", "store");
+        Route::put("middle-test/{middleTest}", "update");
+        Route::delete("middle-test/{middleTest}", "destroy");
+    });
+
+    Route::controller(LivelinessController::class)->group(function () {
+        Route::post("liveliness", "store");
+        Route::put("liveliness/{liveliness}", "update");
+        Route::delete("liveliness/{liveliness}", "destroy");
     });
 });
